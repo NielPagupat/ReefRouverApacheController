@@ -55,19 +55,28 @@ window.addEventListener('load', getCameras);
 // Attach event listener to the switch camera button
 switchCameraButton.addEventListener('click', switchCamera);
 
-//button handlers handling and MQTT client setup
+// button handlers handling and MQTT client setup //
+
 // MQTT client setup
 const client = mqtt.connect('ws://10.0.254.2:9001'); // Example WebSocket broker
 
 // Display connection status
 client.on('connect', () => {
   console.log('Connected to MQTT broker');
+  client.subscribe('RouverState', (err) => {
+    if (err) {
+      console.log(`Failed to subscribe to RouverState: ${err}`);
+    } else {
+      console.log('Subscribed to RouverState');
+    }
+  });
 });
 
 // Handle MQTT connection errors
 client.on('error', (err) => {
   console.log(`Connection error: ${err}`);
-  document.getElementById('status').textContent = `Connection error: ${err}`;
+
+  
 });
 
 // Function to publish a message to a topic
@@ -174,3 +183,33 @@ function toggleButtonState(buttonId, message) {
   }
 }
 
+
+// Listen for new messages on the "RouverState" topic
+client.on('message', (topic, message) => {
+    if (topic === 'RouverState') {
+      // Display the message in the "stateinfo" div as an <h1> element
+      const stateInfoDiv = document.getElementById('stateinfo');
+      
+      // Create a new h1 element to display the message
+      const newMessage = document.createElement('h1');
+      newMessage.classList.add("border",
+                                "border-black",
+                                "p-1",
+                                "rounded-md",
+                                "bg-slate-200",
+                                "text-lg",
+                                "font-mono",
+                                "m-1")
+      newMessage.textContent = message.toString();
+      
+      // Append the new message to the stateinfo div
+      stateInfoDiv.appendChild(newMessage);
+      
+      // Make the div scrollable once content overflows
+      if (stateInfoDiv.scrollHeight > stateInfoDiv.clientHeight) {
+        stateInfoDiv.classList.add('overflow-y-auto');
+      }
+      // Scroll to the newest message
+      stateInfoDiv.scrollTop = stateInfoDiv.scrollHeight;
+    }
+  });
