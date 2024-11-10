@@ -11,6 +11,7 @@
         <meta name="description" content="controller">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="dist/tailwind.css" rel="stylesheet">
+        
     </head>
     <body>
         <div class="flex p-5 justify-center flex-1 h-screen">
@@ -28,14 +29,14 @@
                     <div class="border border-black rounded-t-lg p-3">
                         <h1>Rouver State</h1>
                     </div>
-                    <div class="border border-black rounded-b-lg p-3 h-72">
+                    <div id="stateinfo" class="border border-black rounded-b-lg p-3 h-72">
                         
                     </div>
                 </div>
 
                 <div class="flex-1 justify-center p-2 ">
                     <div class="grid grid-cols-3 h-full border border-black rounded-lg">
-                        <button id="release" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                        <button id="release" class=" flex flex-col justify-center items-center border border-black m-3 rounded-lg">
                             <svg class="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path d="M4 12a8 8 0 0 1 16 0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M12 12v6m0 0l-3-3m3 3l3-3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
@@ -121,6 +122,7 @@
             </div>
             
         </div>
+        <script src="node_modules/mqtt/dist/mqtt.min.js"></script>
         <script src="index.js" async defer></script>
     </body>
 </html>

@@ -55,75 +55,122 @@ window.addEventListener('load', getCameras);
 // Attach event listener to the switch camera button
 switchCameraButton.addEventListener('click', switchCamera);
 
-//button handlers
-  // Function to handle actions based on button or key press
-  function handleAction(action, isActive) {
-    const button = document.getElementById(action);
-    if (isActive) {
-      button.classList.add("bg-green-500", "text-white", "ring-4", "ring-green-400");
+//button handlers handling and MQTT client setup
+// MQTT client setup
+const client = mqtt.connect('ws://10.0.254.2:9001'); // Example WebSocket broker
+
+// Display connection status
+client.on('connect', () => {
+  console.log('Connected to MQTT broker');
+});
+
+// Handle MQTT connection errors
+client.on('error', (err) => {
+  console.log(`Connection error: ${err}`);
+  document.getElementById('status').textContent = `Connection error: ${err}`;
+});
+
+// Function to publish a message to a topic
+function publishMessage(mes) {
+  const topic = 'Controller'; // Topic to publish
+  const message = mes; // Message to send
+  
+  // Publish the message to the topic
+  client.publish(topic, message, { qos: 1 }, (err) => {
+    if (err) {
+      console.log(`Publish failed: ${err}`);
     } else {
-      button.classList.remove("bg-green-500", "text-white", "ring-4", "ring-green-400");
+      console.log(`Message published to ${topic}: ${message}`);
     }
+  });
+}
+
+// Function to handle actions based on button or key press
+function handleAction(action, isActive) {
+  const button = document.getElementById(action);
+  if (isActive) {
+    button.classList.add("bg-green-500", "text-white", "ring-4", "ring-green-400");
+  } else {
+    button.classList.remove("bg-green-500", "text-white", "ring-4", "ring-green-400");
   }
+}
 
-  // Map of keys to button IDs
-  const keyToButtonId = {
-    "q": "release",
-    "w": "forward",
-    "e": "intake",
-    "a": "left",
-    " ": "stop",          // Spacebar
-    "d": "right",
-    "h": "hover",
-    "s": "backward",
-    "f": "thrusters"
-  };
+// Map of keys to button IDs and MQTT messages
+const keyToButtonId = {
+  "q": { id: "release", message: "q", stop:"o"},
+  "w": { id: "forward", message: "D", stop:"x"},
+  "e": { id: "intake", message: "e", stop:"p"},
+  "a": { id: "left", message: "W", stop:"x"},
+  " ": { id: "stop", message: "x", stop:"x"},  // Spacebar
+  "d": { id: "right", message: "S", stop:"x"},
+  "h": { id: "hover", message: "h", stop:"j"},
+  "s": { id: "backward", message: "A", stop:"x"},
+  "f": { id: "thrusters", message: "f", stop:"t"}
+};
 
-  // Set of keys with toggle functionality (q, e, h, f)
-  const toggleKeys = new Set(["q", "e", "h", "f"]);
+// Set of keys with toggle functionality (q, e, h, f)
+const toggleKeys = new Set(["q", "e", "h", "f"]);
 
-  // Add event listeners for keydown and keyup
-  document.addEventListener("keydown", (event) => {
-    const buttonId = keyToButtonId[event.key.toLowerCase()];
-    if (buttonId) {
-      if (toggleKeys.has(event.key.toLowerCase())) {
-        const button = document.getElementById(buttonId);
-        // Toggle active state on keypress for toggle keys
-        if (button.classList.contains("bg-green-500")) {
-          handleAction(buttonId, false); // Deactivate if already active
-        } else {
-          handleAction(buttonId, true);  // Activate if not active
-        }
+// Track active state for toggle buttons
+const activeToggles = {};
+
+// Add event listeners for keydown and keyup
+document.addEventListener("keydown", (event) => {
+  const keyData = keyToButtonId[event.key.toLowerCase()];
+  if (keyData) {
+    const { id: buttonId, message, stop} = keyData;
+
+    if (toggleKeys.has(event.key.toLowerCase())) {
+      // Handle toggle keys: only send message when state changes
+      const button = document.getElementById(buttonId);
+      if (button.classList.contains("bg-green-500")) {
+        handleAction(buttonId, false); // Deactivate if already active
+        publishMessage(`${stop}`); // Publish OFF message
       } else {
-        handleAction(buttonId, true); // Always activate for non-toggle keys
+        handleAction(buttonId, true);  // Activate if not active
+        publishMessage(`${message}`); // Publish ON message
+      }
+    } else {
+      // Non-toggle keys: only publish if button isn't already active
+      if (!buttonId in activeToggles || !activeToggles[buttonId]) {
+        handleAction(buttonId, true); // Activate button
+        publishMessage(`${message}`); // Publish ON message
+        activeToggles[buttonId] = true; // Mark as active
       }
     }
-  });
-
-  document.addEventListener("keyup", (event) => {
-    const buttonId = keyToButtonId[event.key.toLowerCase()];
-    if (buttonId && !toggleKeys.has(event.key.toLowerCase())) {
-      handleAction(buttonId, false); // Deactivate non-toggle keys on keyup
-    }
-  });
-
-  // Add click event listeners for each button
-  document.getElementById("release").addEventListener("click", () => toggleButtonState("release"));
-  document.getElementById("forward").addEventListener("click", () => handleAction("forward", true));
-  document.getElementById("intake").addEventListener("click", () => handleAction("intake", true));
-  document.getElementById("left").addEventListener("click", () => handleAction("left", true));
-  document.getElementById("stop").addEventListener("click", () => handleAction("stop", true));
-  document.getElementById("right").addEventListener("click", () => handleAction("right", true));
-  document.getElementById("hover").addEventListener("click", () => toggleButtonState("hover"));
-  document.getElementById("backward").addEventListener("click", () => handleAction("backward", true));
-  document.getElementById("thrusters").addEventListener("click", () => handleAction("thrusters", true));
-
-  // Toggle button state (for q, e, h, f)
-  function toggleButtonState(buttonId) {
-    const button = document.getElementById(buttonId);
-    if (button.classList.contains("bg-green-500")) {
-      handleAction(buttonId, false); // Deactivate button if it's active
-    } else {
-      handleAction(buttonId, true); // Activate button if it's not active
-    }
   }
+});
+
+document.addEventListener("keyup", (event) => {
+  const keyData = keyToButtonId[event.key.toLowerCase()];
+  if (keyData && !toggleKeys.has(event.key.toLowerCase())) {
+    const { id: buttonId, message, stop } = keyData;
+    handleAction(buttonId, false); // Deactivate button
+    publishMessage(`${stop}`); // Publish OFF message
+    activeToggles[buttonId] = false; // Mark as inactive
+  }
+});
+
+// Add click event listeners for each button
+document.getElementById("release").addEventListener("click", () => toggleButtonState("release", "Q"));
+document.getElementById("forward").addEventListener("click", () => handleAction("forward", true));
+document.getElementById("intake").addEventListener("click", () => handleAction("intake", true));
+document.getElementById("left").addEventListener("click", () => handleAction("left", true));
+document.getElementById("stop").addEventListener("click", () => handleAction("stop", true));
+document.getElementById("right").addEventListener("click", () => handleAction("right", true));
+document.getElementById("hover").addEventListener("click", () => toggleButtonState("hover", "H"));
+document.getElementById("backward").addEventListener("click", () => handleAction("backward", true));
+document.getElementById("thrusters").addEventListener("click", () => handleAction("thrusters", true));
+
+// Toggle button state (for q, e, h, f) with MQTT message
+function toggleButtonState(buttonId, message) {
+  const button = document.getElementById(buttonId);
+  if (button.classList.contains("bg-green-500")) {
+    handleAction(buttonId, false); // Deactivate button if it's active
+    publishMessage(`${message}-OFF`); // Publish OFF message
+  } else {
+    handleAction(buttonId, true); // Activate button if it's not active
+    publishMessage(`${message}-ON`); // Publish ON message
+  }
+}
+
