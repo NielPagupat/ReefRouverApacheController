@@ -23,7 +23,7 @@
                 </div>
                <video id="video" class="border border-black rounded-lg" autoplay playsinline></video>
             </div>
-            <div class="flex-1 m-1">
+            <div class="flex flex-col flex-1 m-1 h-full">
                 <div class="flex flex-col rounded-lg p-2">
                     <div class="border border-black rounded-t-lg p-3">
                         <h1>Rouver State</h1>
@@ -33,8 +33,89 @@
                     </div>
                 </div>
 
-                <div>
-                    Controller Section
+                <div class="flex-1 justify-center p-2 ">
+                    <div class="grid grid-cols-3 h-full border border-black rounded-lg">
+                        <button id="release" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                            <svg class="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M4 12a8 8 0 0 1 16 0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 12v6m0 0l-3-3m3 3l3-3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                            </svg>
+                            Release Pump
+                            <h1>
+                                (Q)
+                            </h1>  
+                        </button>
+                        <button id="forward" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                            <svg class="h-8 w-8 text-gray-600"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"/>
+                              </svg>
+                              Foward
+                              <h1>
+                                (W)
+                              </h1>                              
+                        </button>
+                        <button id="intake" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                            <svg class="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M4 12a8 8 0 0 1 16 0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 12l-3-3m3 3l3-3m-3 3v6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                            </svg>                              
+                            Intake Pump
+                            <h1>
+                                (E)
+                            </h1>  
+                        </button>
+                        <button id="left" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                            <svg class="h-8 w-8 text-gray-600"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"/>
+                              </svg>                              
+                            Left
+                            <h1>
+                                (A)
+                            </h1>  
+                        </button>
+                        <button id="stop" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                            <svg class="h-8 w-8 text-gray-600"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round">  <circle cx="12" cy="12" r="10" />  <line x1="10" y1="15" x2="10" y2="9" />  <line x1="14" y1="15" x2="14" y2="9" />
+                            </svg>
+                            Stop
+                            <h1>
+                                (space)
+                            </h1>  
+                        </button>
+                        <button id="right" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                            <svg class="h-8 w-8 text-gray-600"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                              </svg>                              
+                            Right
+                            <h1>
+                                (D)
+                            </h1>  
+                        </button>
+                        <button id="hover" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                            <svg class="h-8 w-8 text-gray-600"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                            </svg>                              
+                            Hover
+                            <h1>
+                                (H)
+                            </h1>  
+                        </button>
+                        <button id="backward" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                            <svg class="h-8 w-8 text-gray-600"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"> 
+                                <path stroke="none" d="M0 0h24v24H0z"/>  <circle cx="12" cy="12" r="9" />  <line x1="8" y1="12" x2="12" y2="16" />  <line x1="12" y1="8" x2="12" y2="16" />  <line x1="16" y1="12" x2="12" y2="16" /></svg>                            Backward
+                            <h1>
+                                (S)
+                            </h1>  
+                        </button>
+                        <button id="thrusters" class="flex flex-col justify-center items-center border border-black m-3 rounded-lg">
+                            <svg class="h-8 w-8 text-gray-600"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round">  
+                                <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />
+                            </svg>
+                            Thrusters
+                            <h1>
+                                (F)
+                            </h1>  
+                        </button>
+                    </div>
                 </div>
 
             </div>
