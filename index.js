@@ -1,25 +1,48 @@
-// button handlers handling and MQTT client setup //
+let ws;
+let recording = false;
 
 document.addEventListener("DOMContentLoaded", function () {
   const videoElement = document.querySelector('img[alt="Live Feed"]');
-  const ws = new WebSocket('ws://10.0.254.10:8000/ws/video_feed/');
 
-  ws.onopen = function () {
-      console.log("WebSocket connection opened.");
-  };
+  // Function to create and open the WebSocket connection
+  function openWebSocket() {
+    ws = new WebSocket('ws://127.0.0.1:8000/ws/video_feed/');
 
-  ws.onmessage = (event) => {
-      const frameBase64 = event.data;
-      if (videoElement) {
-          videoElement.src = `data:image/jpeg;base64,${frameBase64}`;
-      }
-  };
+    ws.onopen = function () {
+        console.log("WebSocket connection opened.");
+    };
 
-  ws.onclose = () => {
-      console.error('WebSocket closed');
-  };
+    ws.onmessage = (event) => {
+        const frameBase64 = event.data;
+        if (videoElement) {
+            videoElement.src = `data:image/jpeg;base64,${frameBase64}`;
+        }
+    };
+
+    ws.onclose = () => {
+        console.error('WebSocket closed');
+    };
+  }
+
+  // Initially open the WebSocket
+  openWebSocket();
+
+  const recordButton = document.getElementById("recordButton");
+
+  recordButton.addEventListener("click", () => {
+    if (!recording) {
+        ws.send("start_recording");
+        recordButton.textContent = "Stop Recording";
+    } else {
+        ws.send("stop_recording");
+        recordButton.textContent = "Record";
+        // Close and reopen the WebSocket after stopping recording
+        ws.close(); // Close the current WebSocket
+        openWebSocket(); // Reconnect the WebSocket
+    }
+    recording = !recording;
+  });
 });
-
 
 
 // MQTT client setup
