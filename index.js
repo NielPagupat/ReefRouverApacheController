@@ -1,5 +1,27 @@
 // button handlers handling and MQTT client setup //
 
+document.addEventListener("DOMContentLoaded", function () {
+  const videoElement = document.querySelector('img[alt="Live Feed"]');
+  const ws = new WebSocket('ws://10.0.254.10:8000/ws/video_feed/');
+
+  ws.onopen = function () {
+      console.log("WebSocket connection opened.");
+  };
+
+  ws.onmessage = (event) => {
+      const frameBase64 = event.data;
+      if (videoElement) {
+          videoElement.src = `data:image/jpeg;base64,${frameBase64}`;
+      }
+  };
+
+  ws.onclose = () => {
+      console.error('WebSocket closed');
+  };
+});
+
+
+
 // MQTT client setup
 const client = mqtt.connect('ws://10.0.254.4:9001'); // Example WebSocket broker
 
